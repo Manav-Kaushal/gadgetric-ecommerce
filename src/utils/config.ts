@@ -1,4 +1,5 @@
 const config = {
+  appName: "Gadgetric",
   development: {
     backendUrl: "http://localhost:8080/api/v1/dalle",
   },
