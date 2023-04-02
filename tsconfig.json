@@ -19,11 +19,20 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
+      "@pages/*": [
+        "./src/pages/*"
+      ],
+      "@canvas/*": [
+        "./src/canvas/*"
+      ],
       "@components/*": [
         "./src/components/*"
       ],
       "@utils/*": [
         "./src/utils/*"
+      ],
+      "@store/*": [
+        "./src/store/*"
       ],
       "@public/*": [
         "./public/*"

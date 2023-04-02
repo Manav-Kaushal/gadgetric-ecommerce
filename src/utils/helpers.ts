@@ -1,3 +1,7 @@
+export const classNames = (...classNames: any[]): string => {
+  return classNames.filter(Boolean).join(" ");
+};
+
 export const downloadCanvasToImage = () => {
   const canvas = document.querySelector("canvas");
   const dataURL = canvas.toDataURL();
