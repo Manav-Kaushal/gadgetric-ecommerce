@@ -3,12 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSnapshot } from "valtio";
 import state from "@store/index";
 import { fadeAnimation, slideAnimation } from "@utils/motion";
-import { EditorTabs, FilterTabs } from "@utils/constants";
+import { DecalTypes, EditorTabs, FilterTabs } from "@utils/constants";
 import Tab from "@components/Tab";
 import Button from "@components/Button";
 import ColorPicker from "@components/ColorPicker";
 import FilePicker from "@components/FilePicker";
 import AIPIcker from "@components/AIPIcker";
+import { reader } from "@utils/helpers";
 
 type Props = {};
 
@@ -31,12 +32,48 @@ const Customizer = (props: Props) => {
       case "colorpicker":
         return <ColorPicker />;
       case "filepicker":
-        return <FilePicker />;
+        return <FilePicker file={file} setFile={setFile} readFile={readFile} />;
       case "aipicker":
         return <AIPIcker />;
       default:
         return null;
     }
+  };
+
+  const handleDecals = (type: "logo" | "full", result) => {
+    const decalType = DecalTypes[type];
+
+    state[decalType.stateProperty] = result;
+
+    if (!activeFilterTab[decalType.filterTab]) {
+      handleActiveFilterTab(decalType.filterTab);
+    }
+  };
+
+  const handleActiveFilterTab = (tabName: "logoShirt" | "stylishShirt") => {
+    switch (tabName) {
+      case "logoShirt":
+        state.isLogoTexture = !activeFilterTab[tabName];
+        break;
+      case "stylishShirt":
+        state.isFullTexture = !activeFilterTab[tabName];
+        break;
+      default:
+        state.isLogoTexture = true;
+        state.isFullTexture = false;
+    }
+
+    // After setting state, we need activeFilterTab to update the ui
+    setActiveFilterTab((prevState) => {
+      return { ...prevState, [tabName]: !prevState[tabName] };
+    });
+  };
+
+  const readFile = (type) => {
+    reader(file).then((result) => {
+      handleDecals(type, result);
+      setActiveEditorTab("");
+    });
   };
 
   return (
@@ -50,7 +87,7 @@ const Customizer = (props: Props) => {
             {...slideAnimation("left")}
           >
             <div className="flex items-center min-h-screen">
-              <div className="relative  editor-tabs-container tabs">
+              <div className="relative editor-tabs-container tabs">
                 {EditorTabs.map((tab) => (
                   <Tab
                     key={tab.name}
@@ -85,9 +122,9 @@ const Customizer = (props: Props) => {
               <Tab
                 key={tab.name}
                 tab={tab}
-                handleClick={() => {}}
+                handleClick={() => handleActiveFilterTab(tab.name)}
                 isFilterTab
-                isActiveTab=""
+                isActiveTab={activeEditorTab[tab.name]}
               />
             ))}
           </motion.div>

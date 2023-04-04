@@ -1,10 +1,10 @@
 import state from "@store/index";
-import { classNames } from "@utils/helpers";
+import { classNames, getContrastingColor } from "@utils/helpers";
 import React from "react";
 import { useSnapshot } from "valtio";
 
 type Props = {
-  type: "filled";
+  type: "filled" | "outline";
   title: string;
   sx: string;
   handleClick: () => void;
@@ -13,11 +13,17 @@ type Props = {
 const Button = ({ type, title, sx, handleClick }: Props) => {
   const snap = useSnapshot(state);
 
-  const generateStyle = (type: "filled" | "") => {
+  const generateStyle = (type: "filled" | "outline") => {
     if (type === "filled") {
       return {
         backgroundColor: snap.color,
-        color: "#fff",
+        color: getContrastingColor(snap.color),
+      };
+    } else if (type === "outline") {
+      return {
+        borderWidth: "1px",
+        borderColor: snap.color,
+        color: snap.color,
       };
     }
   };
