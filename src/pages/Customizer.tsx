@@ -51,7 +51,6 @@ const Customizer = (props: Props) => {
 
   const handleDecals = (type: "logo" | "full", result: any) => {
     const decalType: any = DecalTypes[type];
-    console.log(decalType.stateProperty);
 
     state[decalType.stateProperty] = result;
 
