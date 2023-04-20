@@ -8,11 +8,11 @@ import { easing } from "maath";
 type Props = {};
 
 const Shirt = (props: Props) => {
-  const snap = useSnapshot(state);
-  const { nodes, materials } = useGLTF("/shirt_baked.glb");
+  const snap: any = useSnapshot(state);
+  const { nodes, materials } = useGLTF("/shirt_baked.glb") as any;
 
-  const logoTexture = useTexture(snap.logoDecal);
-  const fullTexture = useTexture(snap.fullDecal);
+  const logoTexture: any = useTexture(snap.logoDecal);
+  const fullTexture: any = useTexture(snap.fullDecal);
 
   useFrame((state, delta) => {
     easing.dampC(materials.lambert1.color, snap.color, 0.25, delta);

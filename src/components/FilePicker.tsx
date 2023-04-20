@@ -1,7 +1,11 @@
 import React from "react";
 import Button from "./Button";
 
-type Props = {};
+type Props = {
+  file: any;
+  setFile: React.Dispatch<any>;
+  readFile: (type: any) => void;
+};
 
 const FilePicker = ({ file, setFile, readFile }: Props) => {
   return (
@@ -11,13 +15,15 @@ const FilePicker = ({ file, setFile, readFile }: Props) => {
           type="file"
           id="file-upload"
           accept="image/*"
-          onChange={(e) => setFile(e.target.files[0])}
+          onChange={(e) =>
+            e.target.files && e.target.files[0] && setFile(e.target.files[0])
+          }
         />
         <label htmlFor="file-upload" className="filepicker-label">
           Upload File
         </label>
         <p className="mt-2 text-xs text-gray-500 truncate">
-          {file === "" ? "No file selected" : file.name}
+          {file === null ? "No file selected" : file?.name}
         </p>
       </div>
       <div className="flex flex-wrap gap-3 mt-4">

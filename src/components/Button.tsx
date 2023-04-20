@@ -6,8 +6,8 @@ import { useSnapshot } from "valtio";
 type Props = {
   type: "filled" | "outline";
   title: string;
-  sx: string;
-  handleClick: () => void;
+  sx?: string;
+  handleClick?: () => void;
 };
 
 const Button = ({ type, title, sx, handleClick }: Props) => {

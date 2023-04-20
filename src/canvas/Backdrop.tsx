@@ -1,10 +1,14 @@
 import React, { useRef } from "react";
-import { AccumulativeShadows, RandomizedLight } from "@react-three/drei";
+import {
+  AccumulativeShadows,
+  AccumulativeShadowsProps,
+  RandomizedLight,
+} from "@react-three/drei";
 
 type Props = {};
 
 const Backdrop = (props: Props) => {
-  const shadows = useRef();
+  const shadows = useRef<any>();
 
   return (
     <AccumulativeShadows

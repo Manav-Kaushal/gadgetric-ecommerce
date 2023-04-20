@@ -1,13 +1,15 @@
 import state from "@store/index";
 import { easing } from "maath";
-import React, { useRef } from "react";
+import React, { ReactNode, useRef } from "react";
 import { useSnapshot } from "valtio";
 import { useFrame } from "@react-three/fiber";
 
-type Props = {};
+type Props = {
+  children: ReactNode;
+};
 
 const CameraRig = ({ children }: Props) => {
-  const group = useRef();
+  const group = useRef<any>();
   const snap = useSnapshot(state);
 
   useFrame((state, delta) => {
@@ -15,7 +17,7 @@ const CameraRig = ({ children }: Props) => {
     const isMobile = window.innerWidth <= 600;
 
     // Set the initial position of the model
-    let targetPosition = [-0.4, 0, 2];
+    let targetPosition: [x: number, y: number, z: number] = [-0.4, 0, 2];
     if (snap.intro) {
       if (isBreakpoint) targetPosition = [0, 0, 2];
       if (isMobile) targetPosition = [0, 0.2, 2.5];

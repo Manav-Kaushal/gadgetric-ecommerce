@@ -9,19 +9,21 @@ import Button from "@components/Button";
 import ColorPicker from "@components/ColorPicker";
 import FilePicker from "@components/FilePicker";
 import AIPIcker from "@components/AIPIcker";
-import { reader } from "@utils/helpers";
+import { downloadCanvasToImage, reader } from "@utils/helpers";
+import { download } from "@public/assets";
+import { ActiveFilterNames, ActiveTabNames } from "@utils/enums";
 
 type Props = {};
 
 const Customizer = (props: Props) => {
-  const snap = useSnapshot(state);
+  const snap: any = useSnapshot(state);
 
-  const [file, setFile] = useState("");
-  const [prompt, setPrompt] = useState(false);
+  const [file, setFile] = useState<any>("");
+  const [prompt, setPrompt] = useState("");
   const [generatingImg, setGeneratingImg] = useState(false);
 
   const [activeEditorTab, setActiveEditorTab] = useState("");
-  const [activeFilterTab, setActiveFilterTab] = useState({
+  const [activeFilterTab, setActiveFilterTab] = useState<any>({
     logoShirt: true,
     stylishShirt: false,
   });
@@ -29,19 +31,27 @@ const Customizer = (props: Props) => {
   // Show tab content depending on active tab
   const generateTabContent = () => {
     switch (activeEditorTab) {
-      case "colorpicker":
+      case ActiveTabNames.ColorPicker:
         return <ColorPicker />;
-      case "filepicker":
+      case ActiveTabNames.FilePicker:
         return <FilePicker file={file} setFile={setFile} readFile={readFile} />;
-      case "aipicker":
-        return <AIPIcker />;
+      case ActiveTabNames.AiPicker:
+        return (
+          <AIPIcker
+            prompt={prompt}
+            setPrompt={setPrompt}
+            generatingImg={generatingImg}
+            handleSubmit={handleSubmit}
+          />
+        );
       default:
         return null;
     }
   };
 
-  const handleDecals = (type: "logo" | "full", result) => {
-    const decalType = DecalTypes[type];
+  const handleDecals = (type: "logo" | "full", result: any) => {
+    const decalType: any = DecalTypes[type];
+    console.log(decalType.stateProperty);
 
     state[decalType.stateProperty] = result;
 
@@ -50,30 +60,62 @@ const Customizer = (props: Props) => {
     }
   };
 
-  const handleActiveFilterTab = (tabName: "logoShirt" | "stylishShirt") => {
+  const handleSubmit = async (type: "logo" | "full") => {
+    if (!prompt) return alert("Please enter a prompt!");
+
+    try {
+      setGeneratingImg(true);
+      const response = await fetch("/api/v1/dalle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt,
+        }),
+      });
+
+      const data = await response.json();
+      handleDecals(type, `data:image/png;base64,${data.photo}`);
+    } catch (error) {
+      alert(error);
+    } finally {
+      setGeneratingImg(false);
+      setActiveEditorTab("");
+    }
+  };
+
+  const handleActiveFilterTab = (tabName: ActiveFilterNames) => {
     switch (tabName) {
-      case "logoShirt":
+      case ActiveFilterNames.LogoShirt:
         state.isLogoTexture = !activeFilterTab[tabName];
         break;
-      case "stylishShirt":
+      case ActiveFilterNames.StylishShirt:
         state.isFullTexture = !activeFilterTab[tabName];
         break;
       default:
         state.isLogoTexture = true;
         state.isFullTexture = false;
+        break;
     }
 
-    // After setting state, we need activeFilterTab to update the ui
-    setActiveFilterTab((prevState) => {
+    // After setting state, we need activeFilterTab to update the UI
+    setActiveFilterTab((prevState: any) => {
       return { ...prevState, [tabName]: !prevState[tabName] };
     });
   };
 
-  const readFile = (type) => {
+  const readFile = (type: any) => {
     reader(file).then((result) => {
       handleDecals(type, result);
       setActiveEditorTab("");
     });
+  };
+
+  const handleActiveEditorTab = (name: string) => {
+    if (activeEditorTab === name) {
+      setActiveEditorTab("");
+    } else {
+      setActiveEditorTab(name);
+    }
   };
 
   return (
@@ -92,7 +134,7 @@ const Customizer = (props: Props) => {
                   <Tab
                     key={tab.name}
                     tab={tab}
-                    handleClick={() => setActiveEditorTab(tab.name)}
+                    handleClick={() => handleActiveEditorTab(tab.name)}
                   />
                 ))}
                 {generateTabContent()}
@@ -122,11 +164,21 @@ const Customizer = (props: Props) => {
               <Tab
                 key={tab.name}
                 tab={tab}
-                handleClick={() => handleActiveFilterTab(tab.name)}
+                handleClick={() =>
+                  handleActiveFilterTab(tab.name as ActiveFilterNames)
+                }
+                isActiveTab={activeFilterTab[tab.name as ActiveFilterNames]}
                 isFilterTab
-                isActiveTab={activeEditorTab[tab.name]}
               />
             ))}
+            <Tab
+              tab={{
+                name: "download",
+                icon: download,
+              }}
+              handleClick={() => downloadCanvasToImage()}
+              isFilterTab
+            />
           </motion.div>
         </>
       )}
