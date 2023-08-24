@@ -73,7 +73,12 @@ const Customizer = (props: Props) => {
       });
 
       const data = await response.json();
-      handleDecals(type, `data:image/png;base64,${data.photo}`);
+
+      if (response.ok) {
+        handleDecals(type, data.photo[0]);
+      } else {
+        alert(data?.message);
+      }
     } catch (error) {
       alert(error);
     } finally {

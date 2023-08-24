@@ -1,39 +1,39 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Configuration, OpenAIApi } from "openai";
 
 type Data = {
-  photo?: string;
+  photo?: string | object;
   message?: string;
 };
-
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  if (req.method === "POST") {
-    try {
-      const { prompt } = req.body;
-      const response = await openai.createImage({
-        prompt: prompt,
-        n: 1,
-        size: "1024x1024",
-        response_format: "b64_json",
-      });
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: `${req.method} not allowed!` });
+  }
 
-      const image = response.data.data[0].b64_json;
+  try {
+    const { prompt } = req.body;
 
-      res.status(200).json({ photo: image });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Something went wrong!" });
-    }
-  } else {
-    res.status(500).json({ message: `${req.method} not allowed!` });
+    const response = await fetch(
+      "https://api-inference.huggingface.co/models/kandinsky-community/kandinsky-2-1",
+      {
+        headers: {
+          Authorization: "Bearer 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",
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify({ inputs: prompt }),
+      }
+    );
+    const output = await response.json();
+    console.log({ response });
+
+    return res.status(200).json({ photo: output });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Something went wrong!" });
   }
 }
