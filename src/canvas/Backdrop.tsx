@@ -8,7 +8,7 @@ import {
 type Props = {};
 
 const Backdrop = (props: Props) => {
-  const shadows = useRef<any>();
+  const shadows = useRef<any>(null);
 
   return (
     <AccumulativeShadows

@@ -1,4 +1,4 @@
-export const transition = { type: "spring", duration: 0.8 };
+export const transition = { type: "spring", duration: 0.8 } as const;
 
 export const slideAnimation = (direction: "up" | "down" | "left" | "right") => {
   return {
@@ -46,7 +46,7 @@ export const headTextAnimation = {
     stiffness: 40,
     restDelta: 0.001,
     duration: 0.3,
-  },
+  } as const,
 };
 
 export const headContentAnimation = {
@@ -60,7 +60,7 @@ export const headContentAnimation = {
     duration: 0.6,
     delay: 0.2,
     delayChildren: 0.2,
-  },
+  } as const,
 };
 
 export const headContainerAnimation = {
