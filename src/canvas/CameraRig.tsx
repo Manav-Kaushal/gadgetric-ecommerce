@@ -9,7 +9,7 @@ type Props = {
 };
 
 const CameraRig = ({ children }: Props) => {
-  const group = useRef<any>();
+  const group = useRef<any>(null);
   const snap = useSnapshot(state);
 
   useFrame((state, delta) => {
